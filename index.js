@@ -19,6 +19,9 @@ async function run() {
         await client.connect();
         const database = client.db('travelBd');
         const packageCullection = database.collection('packages')
+        const customerCullection = database.collection('customers')
+        const orderCullection = database.collection('orders')
+        const processingOrderCullection = database.collection('processingOrder')
         console.log('Database connected');
 
         //GET API
@@ -44,7 +47,39 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/packages')
+        // Delete APII
+        app.delete('/packages/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await packageCullection.deleteOne(query);
+            res.json(result);
+        })
+
+        // ADD CUSTOMER
+        app.post('/customers', async(req, res) => {
+            const customer = req.body;
+            const result = await customerCullection.insertOne(customer);
+            res.send(result);
+        });
+
+        // GET CUSTOMER
+        app.get('/customers/:email', async(req, res)=>{
+            const email = req.params.email;
+            console.log('Single data is loading', email);
+            const customer = await customerCullection.findOne(email);
+            res.json(customer);
+        });
+
+        // DELETE CUSTOMER
+        app.delete('/customers/:email', async(req, res) => {
+            const email = req.params.email;
+            const result = await customerCullection.deleteOne(email);
+            res.json(result);
+        })
+
+
+
+
     }
     finally{
         // await client.close() 
@@ -63,50 +98,3 @@ app.get('/', (req, res) => {
 app.listen(port, (req, res) => {
     console.log('Server is connected', port);
 });
-
-
-
-// client.connect(err => {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   client.close();
-// });
-
-// [
-// {
-//     "key": 1,
-//     "name": "goa",
-//     "Days": "3 days / 5days",
-//     "price": 163,
-//     "packImg": "https://i.ibb.co/6n2hMD7/13.jpg",
-//     "bannerImg": "https://i.ibb.co/V93SMps/image.jpg",
-//     "details": "details"
-//   },
-//   {
-//     "key": 2,
-//     "name": "Kerala",
-//     "Days": "3 days / 4 days",
-//     "price": 123,
-//     "packImg": "https://i.ibb.co/6n2hMD7/13.jpg",
-//     "bannerImg": "https://i.ibb.co/V93SMps/image.jpg",
-//     "details": "details"
-//   },
-//   {
-//     "key": 3,
-//     "name": "Shundarbon",
-//     "Days": "3 days / 4days",
-//     "price": 117,
-//     "packImg": "https://i.ibb.co/6n2hMD7/13.jpg",
-//     "bannerImg": "https://i.ibb.co/V93SMps/image.jpg",
-//     "details": "details"
-//   },
-//   {
-//     "key": 4,
-//     "name": "Manali",
-//     "Days": "6 days / 7days",
-//     "price": 43,
-//     "packImg": "https://i.ibb.co/6n2hMD7/13.jpg",
-//     "bannerImg": "https://i.ibb.co/V93SMps/image.jpg",
-//     "details": "details"
-//   }
-// ]
